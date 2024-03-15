@@ -7,18 +7,18 @@ import (
 )
 
 
-func GetAllMasters(db *sql.DB, id uint) (err error, results []structs.Masters) {
+func GetAllMasters(db *sql.DB, id uint) (results []structs.Masters, err error) {
 	sql := "SELECT * FROM masters where user_id = $1"
 
 	rows, err := db.Query(sql, id)
-	if err != nil { return err, nil }
+	if err != nil { return nil, err }
 
 	defer rows.Close()
 
 	for rows.Next() {
 		var masters = structs.Masters{}
 		err = rows.Scan(&masters.ID, &masters.Name, &masters.Description, &masters.UserId, &masters.IncomeType, &masters.CreatedAt, &masters.UpdatedAt)
-		if err != nil { return err, nil }
+		if err != nil { return nil, err }
 		
 		results = append(results, masters)
 	}
@@ -46,18 +46,18 @@ func DeleteMaster(db *sql.DB, masters structs.Masters) (err error) {
 	return errs.Err()
 }
 
-func GetMasterById(db *sql.DB, masters structs.Masters) (err error, results []structs.Masters) {
+func GetMasterById(db *sql.DB, masters structs.Masters) (results []structs.Masters, err error) {
 	sql := "SELECT * FROM masters WHERE id = $1"
 
 	rows, err := db.Query(sql, masters.ID)
-	if err != nil { return err, nil }
+	if err != nil { return nil, err }
 
 	defer rows.Close()
 
 	for rows.Next() {
 		var masters = structs.Masters{}
 		err = rows.Scan(&masters.ID, &masters.Name, &masters.Description, &masters.UserId, &masters.IncomeType, &masters.CreatedAt, &masters.UpdatedAt)
-		if err != nil { return err, nil }
+		if err != nil { return nil, err }
 		
 		results = append(results, masters)
 	}

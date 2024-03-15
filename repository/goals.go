@@ -8,18 +8,18 @@ import (
 )
 
 
-func GetAllGoals(db *sql.DB, id uint) (err error, results []structs.Goals) {
+func GetAllGoals(db *sql.DB, id uint) ( results []structs.Goals, err error) {
 	sql := "SELECT * FROM goals where id_user = $1"
 
 	rows, err := db.Query(sql, id)
-	if err != nil { return err, nil }
+	if err != nil { return nil, err }
 
 	defer rows.Close()
 
 	for rows.Next() {
 		var goals = structs.Goals{}
 		err = rows.Scan(&goals.ID, &goals.UserId, &goals.Amount, &goals.AmountGoal, &goals.Name, &goals.Description, &goals.CreatedAt, &goals.UpdatedAt)
-		if err != nil { return err, nil }
+		if err != nil { return nil, err }
 		
 		results = append(results, goals)
 	}
@@ -47,18 +47,18 @@ func DeleteGoals(db *sql.DB, goals structs.Goals) (err error) {
 	return errs.Err()
 }
 
-func GetGoalsById(db *sql.DB, goals structs.Goals) (err error, results []structs.Goals) {
+func GetGoalsById(db *sql.DB, goals structs.Goals) (results []structs.Goals, err error) {
 	sql := "SELECT * FROM masters WHERE id = $1"
 
 	rows, err := db.Query(sql, goals.ID)
-	if err != nil { return err, nil }
+	if err != nil { return nil, err }
 
 	defer rows.Close()
 
 	for rows.Next() {
 		var goals = structs.Goals{}
 		err = rows.Scan(&goals.ID, &goals.UserId, &goals.Amount, &goals.AmountGoal, &goals.Name, &goals.Description, &goals.CreatedAt, &goals.UpdatedAt)
-		if err != nil { return err, nil }
+		if err != nil { return nil, err }
 		
 		results = append(results, goals)
 	}

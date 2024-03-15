@@ -1,34 +1,29 @@
 package controllers
 
 import (
-	"net/http"
 	"financial-journey/database"
+	"financial-journey/helper"
 	"financial-journey/structs"
+	"net/http"
 	"strconv"
 
 	"financial-journey/repository"
+
 	"github.com/gin-gonic/gin"
 )
 
 func GetAllTransactions(c *gin.Context) {
 	id := c.GetUint("id")
-	var (
-		result gin.H
-	) 
+
 
 	transactions, err := repository.GetAllTransactions(database.DbConnection, id)
 
 	if err != nil {
-		result = gin.H{
-			"result":  err,
-		}
-	} else {
-		result = gin.H{
-			"result":  transactions,
-		}
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch transactions", err)
+		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	helper.RespondWithSuccess(c, http.StatusOK, "Transactions retrieved successfully", transactions)
 }
 
 func InsertTransaction(c *gin.Context) {
@@ -43,14 +38,14 @@ func InsertTransaction(c *gin.Context) {
 		// Periksa apakah tujuan (goals) ditemukan
 		goal, err := repository.CheckGoals(database.DbConnection, transactions.GoalId)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to add transactions", err)
 			return
 		}
 		if goal != nil {
 			goal.Amount += transactions.Amount
 			err = repository.UpdateGoal(database.DbConnection, goal)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				helper.RespondWithError(c, http.StatusInternalServerError, "Failed to add transactions", err)
 				return
 			}
 		}
@@ -62,9 +57,7 @@ func InsertTransaction(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success insert transaction",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "Transactions add successfully", nil)
 
 
 }
@@ -83,9 +76,7 @@ func UpdateTransaction(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success update transaction",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success update transaction", nil)
 }
 
 func DeleteTransaction(c *gin.Context) {
@@ -97,7 +88,5 @@ func DeleteTransaction(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success delete transaction",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success delete transaction", nil)
 }

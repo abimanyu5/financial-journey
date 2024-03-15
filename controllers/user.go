@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"financial-journey/database"
+	"financial-journey/helper"
 	"financial-journey/repository"
 	"financial-journey/structs"
 
@@ -28,17 +29,17 @@ func RegisterHandler(c *gin.Context) {
 	}
 	//cek user password lenght
 	if len(user.Password) < 8 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "password harus 8 karakter"})
+		helper.RespondWithError(c, http.StatusBadRequest, "password harus 8 karakter", nil)
 		return
 	}
 	if len(user.Password) > 8 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "password harus 8 karakter"})
+		helper.RespondWithError(c, http.StatusBadRequest, "password harus 8 karakter", nil)
 		return
 	}
 
 	//cek user role apakah admin atau user
 	if user.Role != "admin" && user.Role != "user" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "role tidak ditemukan"})
+		helper.RespondWithError(c, http.StatusBadRequest, "role tidak ditemukan", nil)
 		return
 	}
 	//userList := repository.GetUserByName(database.DbConnection, user.Username)
@@ -50,12 +51,12 @@ func RegisterHandler(c *gin.Context) {
 	}
 
 	if userExist != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
+		helper.RespondWithError(c, http.StatusBadRequest, "Username already exists", nil)
 		return
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "gagal melakukan hashing password"})
+		helper.RespondWithError(c, http.StatusBadRequest, "gagal melakukan hashing password", err)
 		return
 	}
 	user.Password = string(hashedPassword)
@@ -64,48 +65,46 @@ func RegisterHandler(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success register user",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success register user", nil)
 
 
 }
 func LoginHandler(c *gin.Context) {
 		var loginData structs.LoginData
 		if err := c.ShouldBindJSON(&loginData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			helper.RespondWithError(c, http.StatusBadRequest, "kesalahan payload body", err)
 			return
 		}
 
 		user, err := repository.GetUserByUsername(database.DbConnection,loginData.Username)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			helper.RespondWithError(c, http.StatusInternalServerError, "kesalahan sistem", err)
 			return
 		}
 
 		if user == nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username"})
+			helper.RespondWithError(c, http.StatusUnauthorized, "Invalid username", nil)
 			return
 		}
 
 		if user.Username != loginData.Username {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username"})
+			helper.RespondWithError(c, http.StatusUnauthorized, "Invalid username", nil)
 			return
 		}
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginData.Password))
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+			helper.RespondWithError(c, http.StatusBadRequest, "Invalid password", err)
 			return
 		}
 
 		token, err := generateToken(user)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+			helper.RespondWithError(c, http.StatusInternalServerError, "Failed to generate token", err)
 			return
 		}
-
-		c.JSON(http.StatusOK, gin.H{"message":"sukses login","token": token})
+		helper.RespondWithSuccess(c, http.StatusOK, "success login", token)
+		
 	
 }
 

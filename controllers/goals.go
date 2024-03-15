@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"net/http"
 	"financial-journey/database"
+	"financial-journey/helper"
 	"financial-journey/structs"
+	"net/http"
 	"strconv"
 
 	"financial-journey/repository"
@@ -13,23 +14,15 @@ import (
 
 func GetAllGoals(c *gin.Context) {
 	id := c.GetUint("id")
-	var (
-		result gin.H
-	) 
 
 	masters, err := repository.GetAllGoals(database.DbConnection, id)
 
 	if err != nil {
-		result = gin.H{
-			"result":  err,
-		}
-	} else {
-		result = gin.H{
-			"result":  masters,
-		}
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch Goals", err)
+		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	helper.RespondWithSuccess(c, http.StatusOK, "Goals retrieved successfully", masters)
 }
 
 func InsertGoals(c *gin.Context) {
@@ -44,10 +37,7 @@ func InsertGoals(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success insert goals data",
-	})
-
+	helper.RespondWithSuccess(c, http.StatusOK, "success insert goals data", nil)
 
 }
 func UpdateGoals(c *gin.Context) {
@@ -65,9 +55,7 @@ func UpdateGoals(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success update master data",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success update goals data", nil)
 }
 
 func DeleteGoals(c *gin.Context) {
@@ -79,17 +67,11 @@ func DeleteGoals(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success delete master data",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success delete goals data", nil)
 }
 
 func GetGoalsById(c *gin.Context) {
 	var goals structs.Goals
-	var (
-		result gin.H
-	)
-	
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	goals.ID = int(id)
@@ -97,14 +79,9 @@ func GetGoalsById(c *gin.Context) {
 	master, err := repository.GetGoalsById(database.DbConnection, goals)
 
 	if err != nil {
-		result = gin.H{
-			"result":  err,
-		}
-	} else {
-		result = gin.H{
-			"result":  master,
-		}
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch goals by id", err)
+		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	helper.RespondWithSuccess(c, http.StatusOK, "Get goals by id successfully", master)
 }

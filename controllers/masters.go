@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"net/http"
 	"financial-journey/database"
+	"financial-journey/helper"
 	"financial-journey/structs"
+	"net/http"
 	"strconv"
 
 	"financial-journey/repository"
@@ -13,23 +14,15 @@ import (
 
 func GetAllMasters(c *gin.Context) {
 	id := c.GetUint("id")
-	var (
-		result gin.H
-	) 
 
 	masters, err := repository.GetAllMasters(database.DbConnection, id)
 
 	if err != nil {
-		result = gin.H{
-			"result":  err,
-		}
-	} else {
-		result = gin.H{
-			"result":  masters,
-		}
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch masters", err)
+		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	helper.RespondWithSuccess(c, http.StatusOK, "masters retrieved successfully", masters)
 }
 
 func InsertMaster(c *gin.Context) {
@@ -42,11 +35,9 @@ func InsertMaster(c *gin.Context) {
 	}
 	err = repository.InsertMaster(database.DbConnection, masters)
 	if err != nil {
-		panic(err)
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to insert master data", err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success insert master data",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success insert master data", masters)
 
 
 }
@@ -63,11 +54,9 @@ func UpdateMaster(c *gin.Context) {
 
 	err = repository.UpdateMaster(database.DbConnection, masters)
 	if err != nil {
-		panic(err)
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update master data", err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success update master data",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success update master data", masters)
 }
 
 func DeleteMaster(c *gin.Context) {
@@ -77,19 +66,13 @@ func DeleteMaster(c *gin.Context) {
 	
 	err := repository.DeleteMaster(database.DbConnection, masters)
 	if err != nil {
-		panic(err)
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to update master data", err)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"result": "success delete master data",
-	})
+	helper.RespondWithSuccess(c, http.StatusOK, "success delete master data", masters)
 }
 
 func GetMasterById(c *gin.Context) {
 	var masters structs.Masters
-	var (
-		result gin.H
-	)
-	
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	masters.ID = int(id)
@@ -97,14 +80,9 @@ func GetMasterById(c *gin.Context) {
 	master, err := repository.GetMasterById(database.DbConnection, masters)
 
 	if err != nil {
-		result = gin.H{
-			"result":  err,
-		}
-	} else {
-		result = gin.H{
-			"result":  master,
-		}
+		helper.RespondWithError(c, http.StatusInternalServerError, "Failed to fetch masters", err)
+		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	helper.RespondWithSuccess(c, http.StatusOK, "masters retrieved by id successfully", master)
 }

@@ -7,18 +7,18 @@ import (
 )
 
 
-func GetAllTransactions(db *sql.DB, id uint) (err error, results []structs.Transactions) {
+func GetAllTransactions(db *sql.DB, id uint) ( results []structs.Transactions, err error) {
 	sql := "SELECT * FROM transactions where user_id = $1"
 
 	rows, err := db.Query(sql, id)
-	if err != nil { return err, nil }
+	if err != nil { return nil, err }
 
 	defer rows.Close()
 
 	for rows.Next() {
 		var transactions = structs.Transactions{}
 		err = rows.Scan(&transactions.ID, &transactions.MasterId, &transactions.GoalId, &transactions.UserId, &transactions.Amount, &transactions.Title, &transactions.Description, &transactions.CreatedAt, &transactions.UpdatedAt)
-		if err != nil { return err, nil }
+		if err != nil { return nil, err }
 		
 		results = append(results, transactions)
 	}
