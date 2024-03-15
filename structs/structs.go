@@ -37,7 +37,6 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// JWTClaims represents the claims for JWT token
 type JWTClaims struct {
 	Username string `json:"username"`
 	Role     string `json:"role"`
@@ -61,12 +60,4 @@ type Goals struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-// type Reports struct {
-// 	ID            int       `json:"id"`
-// 	UserId        int       `json:"user_id"`
-// 	TotalAmount   int       `json:"total_amount"`
-// 	AmountIncome  int       `json:"amount_income"`
-// 	AmountOutcome int       `json:"amount_outcome"`
-// 	CreatedAt     time.Time `json:"created_at"`
-// 	UpdatedAt     time.Time `json:"updated_at"`
-// }
+
