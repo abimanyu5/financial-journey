@@ -131,18 +131,19 @@ func GetUserHandler(c *gin.Context) {
 	username := c.GetString("username")
 	role := c.GetString("role")
 	id := c.GetUint("id")
-	
-	c.JSON(http.StatusOK, gin.H{"username": username, "role": role, "id": id})
+
+	helper.RespondWithSuccess(c, http.StatusOK, "success get user", gin.H{"username": username, "role": role, "id": id})
 }
 
 // adminHandler handles requests from admin users
 func AdminHandler(c *gin.Context) {
+	username := c.GetString("username")
 	role := c.GetString("role")
+	id := c.GetUint("id")
 
 	if role != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Permission denied"})
+		helper.RespondWithError(c, http.StatusInternalServerError, "Permission denied", nil)
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Welcome, admin!"})
+	helper.RespondWithSuccess(c, http.StatusOK, "success get admin", gin.H{"username": username, "role": role, "id": id})
 }
