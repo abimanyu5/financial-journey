@@ -48,7 +48,7 @@ func DeleteGoals(db *sql.DB, goals structs.Goals) (err error) {
 }
 
 func GetGoalsById(db *sql.DB, goals structs.Goals) (results []structs.Goals, err error) {
-	sql := "SELECT * FROM masters WHERE id = $1"
+	sql := "SELECT * FROM goals WHERE id = $1"
 
 	rows, err := db.Query(sql, goals.ID)
 	if err != nil { return nil, err }
